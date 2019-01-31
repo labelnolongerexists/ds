@@ -1,15 +1,17 @@
 package com.hhrb.ds.learn.tree.bi;
 
 /**
- * User: Z J Wu
- * Date: 2019/1/30
- * Time: 23:13
- * Package: com.hhrb.ds.learn.tree.bi
+ * User: Z J Wu Date: 2019/1/30 Time: 23:13 Package: com.hhrb.ds.learn.tree.bi
  */
 public interface BinaryTree<T> {
+
   enum TraversalType {
-    PreOrder, InOrder, PostOrder
+    PreOrder,
+    InOrder,
+    PostOrder
   }
+
+  void bfs();
 
   TreeNode<T> getLeft();
 

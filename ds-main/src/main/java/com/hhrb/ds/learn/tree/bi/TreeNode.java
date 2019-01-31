@@ -4,6 +4,10 @@ import static com.hhrb.ds.learn.tree.bi.BinaryTree.TraversalType.InOrder;
 import static com.hhrb.ds.learn.tree.bi.BinaryTree.TraversalType.PostOrder;
 import static com.hhrb.ds.learn.tree.bi.BinaryTree.TraversalType.PreOrder;
 
+import com.google.common.collect.Queues;
+
+import java.util.Queue;
+
 /**
  * User: Z J Wu Date: 2019/1/30 Time: 23:18 Package: com.hhrb.ds.learn.tree.bi
  */
@@ -57,6 +61,30 @@ public class TreeNode<T> implements BinaryTree<T> {
 
   public TreeNode<T> getParent() {
     return parent;
+  }
+
+  @Override
+  public void bfs() {
+    Queue<TreeNode<T>> storeQueue = Queues.newLinkedBlockingQueue();
+    TreeNode<T> current = this;
+    storeQueue.add(current);
+    while ((current = storeQueue.poll()) != null) {
+      System.out.println(current.getNodeElement());
+      if (current.hasLeft()) {
+        storeQueue.add(current.getLeft());
+      }
+      if (current.hasRight()) {
+        storeQueue.add(current.getRight());
+      }
+    }
+  }
+
+  public boolean hasLeft() {
+    return getLeft() != null;
+  }
+
+  public boolean hasRight() {
+    return getRight() != null;
   }
 
   @Override
@@ -114,19 +142,19 @@ public class TreeNode<T> implements BinaryTree<T> {
         System.out.println(current);
         return;
     }
-
   }
 
   public static void main(String[] args) {
-    TreeNode<Integer> parent = TreeNode.newNode(1)
-                                       .attachLeft(TreeNode.newNode(2).attachLeft(4).attachRight(5))
-                                       .attachRight(TreeNode.newNode(3).attachRight(6));
-    parent.visit(PreOrder);
+    TreeNode<Integer> root = TreeNode.newNode(1)
+                                     .attachLeft(TreeNode.newNode(2).attachLeft(4).attachRight(5))
+                                     .attachRight(TreeNode.newNode(3).attachRight(6));
+    root.visit(PreOrder);
     System.out.println("---------------------------------");
-    parent.visit(InOrder);
+    root.visit(InOrder);
     System.out.println("---------------------------------");
-    parent.visit(PostOrder);
-
+    root.visit(PostOrder);
+    System.out.println("---------------------------------");
+    root.bfs();
   }
 
 }
