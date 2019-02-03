@@ -61,6 +61,20 @@ public class Heap<T extends Comparable<T>> {
     }
   }
 
+  public void insert(T t) {
+    store.add(t);
+    int currentNodeIdx = store.size() - 1, parentNodeIdx;
+    while ((parentNodeIdx = getParent(currentNodeIdx)) >= 0) {
+      T parentNode = get(parentNodeIdx);
+      if (gt(t, parentNode)) {
+        swap(currentNodeIdx, parentNodeIdx);
+        currentNodeIdx = parentNodeIdx;
+      } else {
+        break;
+      }
+    }
+  }
+
   private boolean hasChildren(int idx) {
     return getLeftChildIdx(idx) > 0;
   }
@@ -69,7 +83,7 @@ public class Heap<T extends Comparable<T>> {
     if (idx <= 0 || idx >= store.size()) {
       return -1;
     }
-    return idx / 2;
+    return (idx - 1) / 2;
   }
 
   public T getLeftChild(int idx) {
@@ -100,6 +114,29 @@ public class Heap<T extends Comparable<T>> {
     store.set(j, t);
   }
 
+  public void delete() {
+    swap(0, size() - 1);
+    store.remove(store.size() - 1);
+    int currentIdx = 0;
+    for (; ; ) {
+      int leftChildIdx = getLeftChildIdx(currentIdx);
+      if (leftChildIdx < 0) {
+        break;
+      }
+      int rightChildIdx = getRightChildIdx(currentIdx), maxNodeIdx;
+      if (rightChildIdx > 0) {
+        maxNodeIdx = indexOfMax(currentIdx, indexOfMax(leftChildIdx, rightChildIdx));
+      } else {
+        maxNodeIdx = indexOfMax(currentIdx, leftChildIdx);
+      }
+      if (currentIdx == maxNodeIdx) {
+        break;
+      }
+      swap(currentIdx, maxNodeIdx);
+      currentIdx = maxNodeIdx;
+    }
+  }
+
   public static void main(String[] args) {
     Random random = new Random();
 
@@ -109,11 +146,19 @@ public class Heap<T extends Comparable<T>> {
     for (int i = 0; i < elementCnt; i++) {
       list.add(random.nextInt(100));
     }
-    //    list.add(1);
-    //    list.add(2);
-    //    list.add(3);
+    //    list.add(79);
+    //    list.add(31);
+    //    list.add(5);
+    //    list.add(90);
     System.out.println(list);
     Heap<Integer> heap = new Heap<>(list);
+    System.out.println(heap.store);
+
+    int newInt = random.nextInt(150);
+    System.out.println(newInt);
+    heap.insert(newInt);
+    System.out.println(heap.store);
+    heap.delete();
     System.out.println(heap.store);
   }
 
