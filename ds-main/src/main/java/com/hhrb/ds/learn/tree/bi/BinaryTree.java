@@ -6,16 +6,11 @@ package com.hhrb.ds.learn.tree.bi;
 public interface BinaryTree<T> {
 
   enum TraversalType {
-    PreOrder,
-    InOrder,
-    PostOrder
+    dfs_PreOrder,
+    dfs_InOrder,
+    dfs_PostOrder,
+    bfs
   }
-
-  void bfs();
-
-  TreeNode<T> getLeft();
-
-  TreeNode<T> getRight();
 
   int size();
 
