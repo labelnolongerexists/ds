@@ -39,24 +39,25 @@ public class Heap<T extends Comparable<T>> {
 
   public Heap(List<T> raw) {
     store = Lists.newArrayList(raw);
+    // 从最后一个叶子节点的父节点开始, 直到根节点
     for (int i = (size() - 1) / 2; i >= 0; i--) {
-      int currentIdx = i;
+      int currentNodeIdx = i;
       for (; ; ) {
-        int leftChildIdx = getLeftChildIdx(currentIdx);
+        int leftChildIdx = getLeftChildIdx(currentNodeIdx);
         if (leftChildIdx < 0) {
           break;
         }
-        int rightChildIdx = getRightChildIdx(currentIdx), maxNodeIdx;
+        int rightChildIdx = getRightChildIdx(currentNodeIdx), maxNodeIdx;
         if (rightChildIdx > 0) {
-          maxNodeIdx = indexOfMax(currentIdx, indexOfMax(leftChildIdx, rightChildIdx));
+          maxNodeIdx = indexOfMax(currentNodeIdx, indexOfMax(leftChildIdx, rightChildIdx));
         } else {
-          maxNodeIdx = indexOfMax(currentIdx, leftChildIdx);
+          maxNodeIdx = indexOfMax(currentNodeIdx, leftChildIdx);
         }
-        if (currentIdx == maxNodeIdx) {
+        if (currentNodeIdx == maxNodeIdx) {
           break;
         }
-        swap(currentIdx, maxNodeIdx);
-        currentIdx = maxNodeIdx;
+        swap(currentNodeIdx, maxNodeIdx);
+        currentNodeIdx = maxNodeIdx;
       }
     }
   }
