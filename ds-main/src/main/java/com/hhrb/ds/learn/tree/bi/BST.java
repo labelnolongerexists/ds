@@ -309,17 +309,18 @@ public class BST<T extends Comparable<T>> implements BinaryTree<T> {
     boolean hasLeft = node.hasLeft(), hasRight = node.hasRight();
     Node parent = node.getParent(), child = hasLeft ? node.getLeft() : node.getRight();
     if (hasLeft && hasRight) {
-      // fixme 並沒有完成
-      Node successor = node.getRight().minNode();
-      System.out.println("Successor - " + successor);
-      if (successor.hasRight()) {
-        successor.getParent().setLeft(successor.getRight());
+      // 查找右子树的minNode, minNode不可能有左孩子, 因为左孩子更小. 但是可能有右孩子
+      // 如果minNode有右孩子, 因为这个minNode要替代被删除的节点, 因此要把minNode的右孩子接到
+      Node minNode = node.getRight().minNode();
+      System.out.println("minNode - " + minNode);
+      if (minNode.hasRight()) {
+        minNode.getParent().setLeft(minNode.getRight());
       }
-      successor.setLeft(node.getLeft());
+      minNode.setLeft(node.getLeft());
       if (node.isLeft()) {
-        parent.setLeft(successor);
+        parent.setLeft(minNode);
       } else if (node.isRight()) {
-        parent.setRight(successor);
+        parent.setRight(minNode);
       } else {
         throw new IllegalStateException();
       }
