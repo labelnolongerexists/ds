@@ -147,10 +147,6 @@ public class Heap<T extends Comparable<T>> {
     for (int i = 0; i < elementCnt; i++) {
       list.add(random.nextInt(100));
     }
-    //    list.add(79);
-    //    list.add(31);
-    //    list.add(5);
-    //    list.add(90);
     System.out.println(list);
     Heap<Integer> heap = new Heap<>(list);
     System.out.println(heap.store);

@@ -16,12 +16,8 @@ public interface BinaryTree<T extends Comparable<T>> {
 
   int size();
 
-  int depth();
-
   void visit(TraversalType traversalType);
 
-  default boolean isFull() {
-    return size() == Math.pow(2, depth()) - 1;
-  }
+  boolean delete(T t);
 
 }
