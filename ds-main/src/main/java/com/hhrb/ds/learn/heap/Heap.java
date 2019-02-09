@@ -115,6 +115,7 @@ public class Heap<T extends Comparable<T>> {
     store.set(j, t);
   }
 
+  // 只能从堆顶删除
   public void delete() {
     swap(0, size() - 1);
     store.remove(store.size() - 1);
