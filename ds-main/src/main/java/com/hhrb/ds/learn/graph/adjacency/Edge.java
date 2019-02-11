@@ -11,11 +11,17 @@ public class Edge<V, E> {
   private Vertex<V> node2;
 
   private E e;
+  private int weight;
 
   public Edge(Vertex<V> node1, Vertex<V> node2, E e) {
+    this(node1, node2, e, 0);
+  }
+
+  public Edge(Vertex<V> node1, Vertex<V> node2, E e, int weight) {
     this.node1 = node1;
     this.node2 = node2;
     this.e = e;
+    this.weight = weight;
   }
 
   public Vertex<V> source() {
@@ -43,6 +49,7 @@ public class Edge<V, E> {
 
   @Override
   public String toString() {
-    return "[" + node1.getValue() + "]-" + e.toString() + "->[" + node2.getValue() + "]";
+    return "[" + node1.getValue() + "]-" + e.toString() + "@" + weight + "->[" + node2
+      .getValue() + "]";
   }
 }

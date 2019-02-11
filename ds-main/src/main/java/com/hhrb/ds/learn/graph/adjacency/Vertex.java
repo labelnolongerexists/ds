@@ -11,12 +11,28 @@ public class Vertex<V> {
 
   private V value;
 
-  public Vertex(int id) {
+  private Vertex(int id, V value) {
+    this.id = id;
+    this.value = value;
+  }
+
+  public static final <V> Vertex<V> createEmpty(int id) {
+    return new Vertex<>(id, null);
+  }
+
+  public static final <V> Vertex<V> create(int id, V vertexVal) {
+    return new Vertex<>(id, vertexVal);
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
     this.id = id;
   }
 
-  public Vertex(int id, V value) {
-    this.id = id;
+  public void setValue(V value) {
     this.value = value;
   }
 
