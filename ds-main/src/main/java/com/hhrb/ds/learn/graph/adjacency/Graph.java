@@ -1,10 +1,14 @@
 package com.hhrb.ds.learn.graph.adjacency;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -67,7 +71,7 @@ public class Graph<V, E> {
     Set<Vertex> visited = Sets.newHashSet();
     Vertex current;
     Queue<Vertex> queue = Queues.newLinkedBlockingQueue();
-    // 简单表示只用keyset的第一个值
+
     StoreNode sn = store.get(vertexId);
     if (sn == null) {
       return;
@@ -144,6 +148,18 @@ public class Graph<V, E> {
     matrixGraph.bfs(0);
     System.out.println("---------------------------------");
     matrixGraph.dfs(0);
+  }
+
+  public List<Integer> shortestPath(int startVertexId, int endVertexId) {
+    StoreNode sn1 = store.get(startVertexId), sn2 = store.get(endVertexId);
+    if (sn1 == null || sn2 == null) {
+      return Collections.emptyList();
+    }
+    List<Integer> path = Lists.newArrayList();
+    PriorityQueue<Integer> queue = Queues.newPriorityQueue();
+
+    
+    return path;
   }
 
   public static void main(String[] args) {
