@@ -252,23 +252,23 @@ public class Graph<V, E> {
         continue;
       }
       for (Edge e : edges) {
-        int targetId = e.getNode2().getId();
-        Pair<Integer, Integer> startTarget = Pair.of(startVertexId, targetId);
-        Path stPath;
+        int targetId = e.getNode2().getId(), eWeight = e.getWeight();
+        Pair<Integer, Integer> start2TargetKey = Pair.of(startVertexId, targetId);
+        Path start2TargetPath;
         if (startVertexId == currentVertexId) {
-          stPath = new Path(startVertexId, targetId, e.getWeight()).addVertex(currentVertexId)
-                                                                   .addVertex(targetId);
-          pathMap.put(startTarget, stPath);
+          start2TargetPath = new Path(startVertexId, targetId, eWeight).addVertex(currentVertexId)
+                                                                       .addVertex(targetId);
+          pathMap.put(start2TargetKey, start2TargetPath);
           queue.offer(targetId);
         } else {
-          Pair<Integer, Integer> startCurrent = Pair.of(startVertexId, currentVertexId);
-          Path startCurrentPath = pathMap.get(startCurrent);
-          stPath = pathMap.get(startTarget);
-          int w = startCurrentPath.getCost() + e.getWeight();
-          if (stPath == null || w < stPath.getCost()) {
-            stPath = new Path(startVertexId, targetId, w).addVertexs(startCurrentPath.getPath())
-                                                         .addVertex(targetId);
-            pathMap.put(startTarget, stPath);
+          Pair<Integer, Integer> start2CurrentKey = Pair.of(startVertexId, currentVertexId);
+          Path start2CurrentPath = pathMap.get(start2CurrentKey);
+          start2TargetPath = pathMap.get(start2TargetKey);
+          int w = start2CurrentPath.getCost() + eWeight;
+          if (start2TargetPath == null || w < start2TargetPath.getCost()) {
+            start2TargetPath = new Path(startVertexId, targetId, w)
+              .addVertexs(start2CurrentPath.getPath()).addVertex(targetId);
+            pathMap.put(start2TargetKey, start2TargetPath);
             queue.offer(targetId);
           }
         }
