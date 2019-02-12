@@ -52,4 +52,36 @@ public class Edge<V, E> {
     return "[" + node1.getValue() + "]-" + e.toString() + "@" + weight + "->[" + node2
       .getValue() + "]";
   }
+
+  public Vertex<V> getNode1() {
+    return node1;
+  }
+
+  public void setNode1(Vertex<V> node1) {
+    this.node1 = node1;
+  }
+
+  public Vertex<V> getNode2() {
+    return node2;
+  }
+
+  public void setNode2(Vertex<V> node2) {
+    this.node2 = node2;
+  }
+
+  public E getE() {
+    return e;
+  }
+
+  public void setE(E e) {
+    this.e = e;
+  }
+
+  public int getWeight() {
+    return weight;
+  }
+
+  public void setWeight(int weight) {
+    this.weight = weight;
+  }
 }

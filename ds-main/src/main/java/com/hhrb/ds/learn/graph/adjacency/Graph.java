@@ -4,11 +4,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,10 +54,10 @@ public class Graph<V, E> {
   }
 
   public void addRelation(Vertex<V> source, Vertex<V> target, E edgeVal, int weight) {
-    if (!store.containsKey(source) || !store.containsKey(target)) {
+    if (!store.containsKey(source.getId()) || !store.containsKey(target.getId())) {
       return;
     }
-    Set<Edge<V, E>> relationsOfSource = store.get(source).getOutEdges();
+    Set<Edge<V, E>> relationsOfSource = store.get(source.getId()).getOutEdges();
     relationsOfSource.add(new Edge<>(source, target, edgeVal, weight));
   }
 
@@ -150,33 +151,160 @@ public class Graph<V, E> {
     matrixGraph.dfs(0);
   }
 
-  public List<Integer> shortestPath(int startVertexId, int endVertexId) {
-    StoreNode sn1 = store.get(startVertexId), sn2 = store.get(endVertexId);
-    if (sn1 == null || sn2 == null) {
-      return Collections.emptyList();
-    }
-    List<Integer> path = Lists.newArrayList();
-    PriorityQueue<Integer> queue = Queues.newPriorityQueue();
+  public static final class Path {
 
-    
-    return path;
+    private int startVId;
+    private int endVId;
+
+    private int cost;
+    private List<Integer> path;
+
+    public Path(int startVId, int endVId, int cost) {
+      this.path = Lists.newArrayList();
+      this.startVId = startVId;
+      this.endVId = endVId;
+      this.cost = cost;
+    }
+
+    public Path addVertex(int vertexId) {
+      this.path.add(vertexId);
+      return this;
+    }
+
+    public Path addVertexs(List<Integer> vertexIds) {
+      this.path.addAll(vertexIds);
+      return this;
+    }
+
+    public int getStartVId() {
+      return startVId;
+    }
+
+    public void setStartVId(int startVId) {
+      this.startVId = startVId;
+    }
+
+    public int getEndVId() {
+      return endVId;
+    }
+
+    public void setEndVId(int endVId) {
+      this.endVId = endVId;
+    }
+
+    public int getCost() {
+      return cost;
+    }
+
+    public void setCost(int cost) {
+      this.cost = cost;
+    }
+
+    public List<Integer> getPath() {
+      return path;
+    }
+
+    public void setPath(List<Integer> path) {
+      this.path = path;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o)
+        return true;
+      if (!(o instanceof Path))
+        return false;
+      Path path = (Path) o;
+      return startVId == path.startVId && endVId == path.endVId;
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(startVId, endVId);
+    }
+
+    @Override
+    public String toString() {
+      return new StringBuilder().append("Path(").append(getStartVId()).append("->")
+                                .append(getEndVId()).append("): ").append(getPath()).append("@")
+                                .append(getCost()).toString();
+    }
   }
 
-  public static void main(String[] args) {
+  public Path dijkstraShortestPath(int startVertexId, int endVertexId) {
+    StoreNode sn1 = store.get(startVertexId), sn2 = store.get(endVertexId);
+    if (sn1 == null || sn2 == null) {
+      return null;
+    }
+    if (startVertexId == endVertexId) {
+      return new Path(startVertexId, endVertexId, 0).addVertex(startVertexId);
+    }
+    //    Set<Integer> checked = Sets.newHashSet();
+    Queue<Integer> queue = Queues.newLinkedBlockingQueue();
+    queue.offer(sn1.getVertex().getId());
+    Integer currentVertexId;
+    Map<Pair<Integer, Integer>, Path> pathMap = Maps.newHashMap();
+    Set<Integer> settled = Sets.newHashSet();
+    while ((currentVertexId = queue.poll()) != null) {
+      if(settled.contains(currentVertexId)){
+      continue;
+      }
+      settled.add(currentVertexId);
+      if (currentVertexId == endVertexId) {
+        continue;
+      }
+      StoreNode sn = store.get(currentVertexId);
+
+      Set<Edge> edges = sn.getOutEdges();
+      if (CollectionUtils.isEmpty(edges)) {
+        continue;
+      }
+      for (Edge e : edges) {
+        int targetId = e.getNode2().getId();
+
+        Pair<Integer, Integer> startTarget = Pair.of(startVertexId, targetId);
+        Path stPath;
+        if (startVertexId == currentVertexId) {
+          stPath = new Path(startVertexId, targetId, e.getWeight()).addVertex(currentVertexId)
+                                                                   .addVertex(targetId);
+          pathMap.put(startTarget, stPath);
+          queue.offer(targetId);
+        } else {
+          Pair<Integer, Integer> startCurrent = Pair.of(startVertexId, currentVertexId);
+          Path startCurrentPath = pathMap.get(startCurrent);
+          stPath = pathMap.get(startTarget);
+          int w = startCurrentPath.getCost() + e.getWeight();
+
+
+          if (stPath == null || w < stPath.getCost()) {
+            if(stPath==null){
+              queue.offer(targetId);
+            }
+            stPath = new Path(startVertexId, targetId, w).addVertexs(startCurrentPath.getPath())
+                                                         .addVertex(targetId);
+            pathMap.put(startTarget, stPath);
+          }
+        }
+      }
+    }
+    return pathMap.get(Pair.of(startVertexId, endVertexId));
+  }
+
+  public static void testCaseDijkstra() {
     Graph<Integer, Integer> g = new Graph<>();
     AtomicInteger counter = new AtomicInteger(1);
 
-    int i = counter.incrementAndGet();
+    int i = counter.getAndIncrement();
     Vertex<Integer> v1 = Vertex.create(i, i);
-    i = counter.incrementAndGet();
+    i = counter.getAndIncrement();
     Vertex<Integer> v2 = Vertex.create(i, i);
-    i = counter.incrementAndGet();
+    i = counter.getAndIncrement();
     Vertex<Integer> v3 = Vertex.create(i, i);
-    i = counter.incrementAndGet();
+    i = counter.getAndIncrement();
     Vertex<Integer> v4 = Vertex.create(i, i);
-    i = counter.incrementAndGet();
+    i = counter.getAndIncrement();
     Vertex<Integer> v5 = Vertex.create(i, i);
-    i = counter.incrementAndGet();
+    i = counter.getAndIncrement();
     Vertex<Integer> v6 = Vertex.create(i, i);
 
     g.addVertex(v1);
@@ -186,20 +314,31 @@ public class Graph<V, E> {
     g.addVertex(v5);
     g.addVertex(v6);
 
-    g.addRelation(v1, v2, counter.incrementAndGet(), 1);
-    g.addRelation(v1, v3, counter.incrementAndGet(), 12);
+    g.addRelation(v1, v2, counter.getAndIncrement(), 1);
+    g.addRelation(v1, v3, counter.getAndIncrement(), 12);
 
-    g.addRelation(v2, v3, counter.incrementAndGet(), 9);
-    g.addRelation(v2, v4, counter.incrementAndGet(), 3);
+    g.addRelation(v2, v3, counter.getAndIncrement(), 9);
+    g.addRelation(v2, v4, counter.getAndIncrement(), 3);
 
-    g.addRelation(v3, v5, counter.incrementAndGet(), 5);
+    g.addRelation(v3, v5, counter.getAndIncrement(), 5);
+    /*
+     * FIXME: 2019-02-12 有环, 还没处理好
+     */
+    g.addRelation(v3, v2, counter.getAndIncrement(), 1);
 
-    g.addRelation(v4, v3, counter.incrementAndGet(), 4);
-    g.addRelation(v4, v5, counter.incrementAndGet(), 13);
-    g.addRelation(v4, v6, counter.incrementAndGet(), 15);
+    g.addRelation(v4, v3, counter.getAndIncrement(), 4);
+    g.addRelation(v4, v5, counter.getAndIncrement(), 13);
+    g.addRelation(v4, v6, counter.getAndIncrement(), 15);
 
-    g.addRelation(v5, v6, counter.incrementAndGet(), 4);
+    g.addRelation(v5, v6, counter.getAndIncrement(), 4);
 
+    for (int j = 0; j < 6; j++) {
+      System.out.println(g.dijkstraShortestPath(j + 1, 6));
+    }
+  }
+
+  public static void main(String[] args) {
+    testCaseDijkstra();
   }
 
 }
