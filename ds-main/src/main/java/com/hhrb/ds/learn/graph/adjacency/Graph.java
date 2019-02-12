@@ -239,29 +239,20 @@ public class Graph<V, E> {
     if (startVertexId == endVertexId) {
       return new Path(startVertexId, endVertexId, 0).addVertex(startVertexId);
     }
-    //    Set<Integer> checked = Sets.newHashSet();
     Queue<Integer> queue = Queues.newLinkedBlockingQueue();
     queue.offer(sn1.getVertex().getId());
     Integer currentVertexId;
     Map<Pair<Integer, Integer>, Path> pathMap = Maps.newHashMap();
-    Set<Integer> settled = Sets.newHashSet();
     while ((currentVertexId = queue.poll()) != null) {
-      if(settled.contains(currentVertexId)){
-      continue;
-      }
-      settled.add(currentVertexId);
       if (currentVertexId == endVertexId) {
         continue;
       }
-      StoreNode sn = store.get(currentVertexId);
-
-      Set<Edge> edges = sn.getOutEdges();
+      Set<Edge<V, E>> edges = store.get(currentVertexId).getOutEdges();
       if (CollectionUtils.isEmpty(edges)) {
         continue;
       }
       for (Edge e : edges) {
         int targetId = e.getNode2().getId();
-
         Pair<Integer, Integer> startTarget = Pair.of(startVertexId, targetId);
         Path stPath;
         if (startVertexId == currentVertexId) {
@@ -274,15 +265,11 @@ public class Graph<V, E> {
           Path startCurrentPath = pathMap.get(startCurrent);
           stPath = pathMap.get(startTarget);
           int w = startCurrentPath.getCost() + e.getWeight();
-
-
           if (stPath == null || w < stPath.getCost()) {
-            if(stPath==null){
-              queue.offer(targetId);
-            }
             stPath = new Path(startVertexId, targetId, w).addVertexs(startCurrentPath.getPath())
                                                          .addVertex(targetId);
             pathMap.put(startTarget, stPath);
+            queue.offer(targetId);
           }
         }
       }
@@ -321,9 +308,6 @@ public class Graph<V, E> {
     g.addRelation(v2, v4, counter.getAndIncrement(), 3);
 
     g.addRelation(v3, v5, counter.getAndIncrement(), 5);
-    /*
-     * FIXME: 2019-02-12 有环, 还没处理好
-     */
     g.addRelation(v3, v2, counter.getAndIncrement(), 1);
 
     g.addRelation(v4, v3, counter.getAndIncrement(), 4);
@@ -335,6 +319,7 @@ public class Graph<V, E> {
     for (int j = 0; j < 6; j++) {
       System.out.println(g.dijkstraShortestPath(j + 1, 6));
     }
+    System.out.println(g.dijkstraShortestPath(2, 5));
   }
 
   public static void main(String[] args) {
