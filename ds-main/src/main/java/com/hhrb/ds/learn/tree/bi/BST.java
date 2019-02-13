@@ -16,37 +16,34 @@ import java.util.Set;
  */
 public class BST<T extends Comparable<T>> implements BinaryTree<T> {
 
-  private static final int ROOT = 0;
-  private static final int LEFT = 1;
-  private static final int RIGHT = 2;
+  public static final int ROOT = 0;
+  public static final int LEFT = 1;
+  public static final int RIGHT = 2;
 
-  private static class Node<T> {
+  public static class Node<T> {
 
-    private Node<T> parent;
-    private Node<T> left;
-    private Node<T> right;
-    private T nodeElement;
+    protected Node<T> parent;
+    protected Node<T> left;
+    protected Node<T> right;
+    protected T nodeElement;
 
-    private int nodeDirection;
-
-    private Node(int nodeDirection, Node<T> parent, Node<T> left, Node<T> right, T nodeElement) {
-      this.nodeDirection = nodeDirection;
+    public Node(Node<T> parent, Node<T> left, Node<T> right, T nodeElement) {
       this.parent = parent;
       this.left = left;
       this.right = right;
       this.nodeElement = nodeElement;
     }
 
-    public static final <T> Node<T> root(T t) {
-      return new Node<>(ROOT, null, null, null, t);
+    public static <T> Node<T> root(T t) {
+      return new Node<>(null, null, null, t);
     }
 
     public static final <T> Node<T> leftChild(Node<T> parent, T nodeElement) {
-      return new Node<>(LEFT, parent, null, null, nodeElement);
+      return new Node<>(parent, null, null, nodeElement);
     }
 
     public static final <T> Node<T> rightChild(Node<T> parent, T nodeElement) {
-      return new Node<>(RIGHT, parent, null, null, nodeElement);
+      return new Node<>(parent, null, null, nodeElement);
     }
 
     public boolean hasChildren() {
@@ -86,9 +83,16 @@ public class BST<T extends Comparable<T>> implements BinaryTree<T> {
       }
     }
 
+    public int getDirection() {
+      if (this.parent == null) {
+        return ROOT;
+      }
+      return this == this.parent.left ? LEFT : RIGHT;
+    }
+
     private void printNode() {
       String nodeDir;
-      switch (nodeDirection) {
+      switch (getDirection()) {
         case LEFT:
           nodeDir = "L";
           break;
@@ -110,14 +114,6 @@ public class BST<T extends Comparable<T>> implements BinaryTree<T> {
 
     public void removeRight() {
       setRight(null);
-    }
-
-    public int getNodeDirection() {
-      return nodeDirection;
-    }
-
-    public void setNodeDirection(int nodeDirection) {
-      this.nodeDirection = nodeDirection;
     }
 
     private Node<T> minNode() {
@@ -178,7 +174,6 @@ public class BST<T extends Comparable<T>> implements BinaryTree<T> {
     public void setLeft(Node<T> l) {
       this.left = l;
       l.setParent(this);
-      l.setNodeDirection(LEFT);
     }
 
     public Node<T> getRight() {
@@ -188,7 +183,6 @@ public class BST<T extends Comparable<T>> implements BinaryTree<T> {
     public void setRight(Node<T> r) {
       this.right = r;
       r.setParent(this);
-      r.setNodeDirection(RIGHT);
     }
 
     public T getNodeElement() {
@@ -201,8 +195,7 @@ public class BST<T extends Comparable<T>> implements BinaryTree<T> {
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(this).add("nodeElement", nodeElement)
-                        .add("nodeDirection", nodeDirection).toString();
+      return MoreObjects.toStringHelper(this).add("nodeElement", nodeElement).toString();
     }
   }
 
@@ -251,8 +244,7 @@ public class BST<T extends Comparable<T>> implements BinaryTree<T> {
           child = Node.leftChild(node, t);
           node.setLeft(child);
         }
-
-        return;
+        break;
       }
       node = child;
     }
